@@ -1,0 +1,12 @@
+it\majorbit\model\Errore.class
+it\majorbit\service\QuoteService.class
+it\majorbit\model\Quote.class
+it\majorbit\util\Crypter.class
+it\majorbit\util\Request.class
+it\majorbit\util\Token.class
+it\majorbit\run\MsQuotesApplication.class
+it\majorbit\repositories\ErroreRepository.class
+it\majorbit\repositories\QuotesRepository.class
+it\majorbit\service\ErroreService.class
+it\majorbit\controller\QuotesController.class
+it\majorbit\util\Auth.class
