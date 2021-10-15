@@ -117,64 +117,66 @@ public class Auth {
 	}
 
 
-	public static boolean isAuthorized(Map<String, String> header) {
+	public static String isAuthorized(Map<String, String> header) {
 
-		// header contiene username e token di chi ha effettuato il login e vuole
-		// effettuare delle operazioni. Username e token sono
-		// contenuti nella stessa Stringa (del tipo "username token") che è il valore
-		// della chiave 'authorization' della mappa header. Lo username sarà mandato
-		// all'applicazione auth, al metodo getTokenByUsername che mi restituisce il
-		// token associato all'username. La response, che
-		// contiene questo token, deve essere confrontata con il token presente
-		// nell'authorization. Se sono uguali, allora chi è
-		// loggato è autorizzato ad effettuare le operazioni richieste
-
-		// header è l'intestazione della richiesta. Spring la mette in automatico grazie
-		// all'annotazione
-
-		// Authorization rientra nel protocollo Kerberos
+		/*
+		 * header contiene email, token e encryptionKey di chi ha effettuato il login e
+		 * vuole effettuare delle operazioni. Email, token e sono contenuti nella stessa
+		 * Stringa (del tipo "email token&:encryptionKey") che è il valore della chiave
+		 * 'authorization' della mappa header. L'email sarà mandata all'applicazione
+		 * MSAuth, al metodo readIndexInRegister che mi restituisce il token associato
+		 * all'email. La response, che contiene questo token, deve essere confrontata
+		 * con il token presente nell'authorization. Se sono uguali, allora chi è
+		 * loggato è autorizzato ad effettuare le operazioni richieste
+		 * 
+		 * header è l'intestazione della richiesta. Spring la mette in automatico grazie
+		 * all'annotazione
+		 * 
+		 * Authorization rientra nel protocollo Kerberos
+		 */
 
 		String authorization = header.get("authorization");
-		if (authorization!=null && !authorization.isEmpty()){
-			if (authorization.trim().equals(authorization)) {  //Controllo che non vi siano degli spazi agli estremi della mia Stringa
-
+		if (authorization != null && !authorization.isEmpty()) {
+			if (authorization.trim().equals(authorization)) { // Controllo che non vi siano degli spazi agli estremi
+																// della mia Stringa
 
 				if (authorization.contains(" ")) {
 
-					String tokenAndEncryptionKey = authorization.split(" ")[1];
-					String email = authorization.split(" ")[0];
-					String nomeAuth="social_mb";
+					String nomeAuth = "social_mb";
 
-					String token = tokenAndEncryptionKey.split("&:")[0];
 					try {
-						String decryptedEmail= Auth.decrypt(email);
 
 						Map<String, Object> request = new HashMap<>();
-						request.put("email", decryptedEmail);
-						request.put("nomeAuth",nomeAuth);
+						request.put("authorization", authorization);
+						request.put("nomeAuth", nomeAuth);
 
-						String response = Request.post("http://" + MS_AUTH + ":8084/readIndexInRegister", request, null);
+						String response = Request.post("http://" + MS_AUTH + ":8084/readIndexInRegister", request,
+								null);
 
-						if (!response.equals(token)) {
-							return false;
+						Map<String,Object> responseMap= new Gson().fromJson(response, HashMap.class);
+						
+						if (!(boolean) responseMap.get("hasError")) {
+							return  (String) responseMap.get("authorization");
+						}else {
+							return null;
 						}
+
 						// response contiene il token risposta della mia richiesta relativo allo
 						// username inserito
 					} catch (Exception e1) {
-						return false;
+						return null;
 					}
 
-					return true;
 				}
 
+				return null;
 
 			}
 
-			return false;
+			return null;
+
 		}
-
-		return false;
-
+		return null;
 	}
 
 	// restituisce l encryptionKey

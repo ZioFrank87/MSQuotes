@@ -34,7 +34,9 @@ public class QuotesController {
 	@PostMapping("register_quote")
 	public @ResponseBody ResponseEntity<Object> registerQuote(@RequestBody Map<String,String> params,@RequestHeader Map<String, String> header){
 
-		if (Auth.isAuthorized(header)) {	
+		String authorization = Auth.isAuthorized(header);
+		
+			if (authorization != null) {	
 
 			String encryptedString = (String)params.get("r");
 
@@ -51,7 +53,8 @@ public class QuotesController {
 			quoteService.registerQuote(newQuote);
 			String messageToBeCrypted = "Quote creato con successo";
 			String cryptedMessage = Auth.cryptByEncryptionKey(messageToBeCrypted,encryptionKey);
-			return ResponseEntity.status(HttpStatus.OK).body(cryptedMessage);
+			return ResponseEntity.status(HttpStatus.OK).header("Authorization", authorization)
+					.header("Access-Control-Expose-Headers", "authorization").body(cryptedMessage);
 
 		}
 
@@ -68,7 +71,9 @@ public class QuotesController {
 	@GetMapping("read_quote")
 	public @ResponseBody ResponseEntity<Object> readQuote(@RequestParam String id, @RequestHeader Map<String, String> header){
 
-		if (Auth.isAuthorized(header)) {
+		String authorization = Auth.isAuthorized(header);
+		
+			if (authorization != null)  {
 
 			String encryptionKey = Auth.getEncryptionKey(header);
 
@@ -84,14 +89,16 @@ public class QuotesController {
 
 				String CryptedJsonString = Auth.cryptByEncryptionKey(quoteToBeRetrieved,encryptionKey);
 
-				return ResponseEntity.status(HttpStatus.OK).body(CryptedJsonString);
+				return ResponseEntity.status(HttpStatus.OK).header("Authorization", authorization)
+						.header("Access-Control-Expose-Headers", "authorization").body(CryptedJsonString);
 			}
 
 			else {
 				Map<String,Object> error = new HashMap<String,Object>(); //mappa di errore generata nel caso in cui lo sfondo cercato non esista
 				error.put("hasError", true);
 				error.put("message", erroreService.readErrore("QUOTES_NOT_EXISTING_ERROR").getTextIta());
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Authorization", authorization)
+						.header("Access-Control-Expose-Headers", "authorization").body(error);
 
 			}
 
@@ -109,7 +116,9 @@ public class QuotesController {
 	@DeleteMapping("delete_quote")
 	public @ResponseBody ResponseEntity<Object> deleteQuote(@RequestParam String id, @RequestHeader Map<String, String> header){
 
-		if (Auth.isAuthorized(header)) {  //controlla se l'utente è loggato
+		String authorization = Auth.isAuthorized(header);
+		
+			if (authorization != null)  {  //controlla se l'utente è loggato
 
 			String encryptionKey = Auth.getEncryptionKey(header);
 
@@ -126,7 +135,8 @@ public class QuotesController {
 				quoteService. deleteQuote(quoteToBeDeleted);
 				String messageToBeCrypted = "Quote eliminato";
 				String cryptedMessage = Auth.cryptByEncryptionKey(messageToBeCrypted,encryptionKey); 
-				return ResponseEntity.status(HttpStatus.OK).body(cryptedMessage);
+				return ResponseEntity.status(HttpStatus.OK).header("Authorization", authorization)
+						.header("Access-Control-Expose-Headers", "authorization").body(cryptedMessage);
 			}	
 
 			else {
@@ -134,7 +144,8 @@ public class QuotesController {
 				Map<String,Object> error = new HashMap<String,Object>(); //mappa di errore generata nel caso in cui il gruppo non esiste
 				error.put("hasError", true);
 				error.put("message", erroreService.readErrore("QUOTES_NOT_EXISTING_ERROR").getTextIta());
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Authorization", authorization)
+						.header("Access-Control-Expose-Headers", "authorization").body(error);
 			}
 
 		} else {
@@ -151,7 +162,10 @@ public class QuotesController {
 
 	@PutMapping("update_quote")
 	public @ResponseBody ResponseEntity<Object> updateQuote(@RequestBody Map<String,String> params, @RequestHeader Map<String, String> header) { 
-		if (Auth.isAuthorized(header)) { //verifica che l'utente sia loggato
+		
+		String authorization = Auth.isAuthorized(header);
+		
+			if (authorization != null)  { //verifica che l'utente sia loggato
 
 			String encryptedString = (String)params.get("r");
 
@@ -173,14 +187,16 @@ public class QuotesController {
 				quoteService.registerQuote(quoteToBeUpdated);
 				String messageToBeCrypted = "Quote aggiornato";
 				String cryptedMessage = Auth.cryptByEncryptionKey(messageToBeCrypted,encryptionKey); 
-				return ResponseEntity.status(HttpStatus.OK).body(cryptedMessage);	
+				return ResponseEntity.status(HttpStatus.OK).header("Authorization", authorization)
+						.header("Access-Control-Expose-Headers", "authorization").body(cryptedMessage);	
 			}	
 
 			else {
 				Map<String,Object> error = new HashMap<String,Object>(); //mappa di errore generata nel caso in cui il gruppo non esista
 				error.put("hasError", true);
 				error.put("message", erroreService.readErrore("QUOTES_NOT_EXISTING_ERROR").getTextIta());
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);			
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Authorization", authorization)
+						.header("Access-Control-Expose-Headers", "authorization").body(error);			
 			}
 		}
 
