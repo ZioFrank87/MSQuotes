@@ -1,4 +1,5 @@
 package it.majorbit.util;
+import java.nio.charset.Charset;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -85,15 +86,16 @@ public class Auth {
 	}
 
 	public static String decryptByEncryptionKey(String strEncrypted, String encryptionKey) {
-		String strData="";
+		String strData = "";
 
 		try {
-			SecretKeySpec skeyspec=new SecretKeySpec(encryptionKey.getBytes("ASCII"),"Blowfish");
-			Cipher cipher=Cipher.getInstance("Blowfish");
+			SecretKeySpec skeyspec = new SecretKeySpec(encryptionKey.getBytes("ASCII"), "Blowfish");
+			Cipher cipher = Cipher.getInstance("Blowfish");
 			cipher.init(Cipher.DECRYPT_MODE, skeyspec);
-			byte [] strToDecrypt= Base64.decodeBase64(strEncrypted);
-			byte[] decrypted=cipher.doFinal(strToDecrypt);
-			strData=new String(decrypted);
+			byte[] strToDecrypt = Base64.decodeBase64(strEncrypted);
+			byte[] decrypted = cipher.doFinal(strToDecrypt);
+			strData = new String (decrypted, Charset.forName("ISO-8859-1"));
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
