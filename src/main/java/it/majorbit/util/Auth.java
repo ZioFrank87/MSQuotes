@@ -70,14 +70,15 @@ public class Auth {
 	}
 
 	public static String cryptByEncryptionKey(Object toEncrypt, String encryptionKey) {
-		String strData="";
+		String strData = "";
 		String toEncryptJson = new Gson().toJson(toEncrypt);
 
 		try {
-			SecretKeySpec skeyspec=new SecretKeySpec(encryptionKey.getBytes("ASCII"),"Blowfish");
-			Cipher cipher=Cipher.getInstance("Blowfish");
+			SecretKeySpec skeyspec = new SecretKeySpec(encryptionKey.getBytes("ASCII"), "Blowfish");
+			Cipher cipher = Cipher.getInstance("Blowfish");
 			cipher.init(Cipher.ENCRYPT_MODE, skeyspec);
-			byte[] encrypted=cipher.doFinal(toEncryptJson.getBytes());
+			byte[] encrypted = cipher.doFinal(toEncryptJson.getBytes(Charset.forName("ISO-8859-1")));
+			
 			strData= Base64.encodeBase64String(encrypted);
 		} catch (Exception e) {
 			e.printStackTrace();
